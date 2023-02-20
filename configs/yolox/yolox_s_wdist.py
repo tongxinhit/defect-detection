@@ -15,11 +15,10 @@ model = dict(
                 out_channels=128,
                 num_csp_blocks=1),
     bbox_head=dict(
-                type='YOLOXHead', 
-                num_classes=8, 
-                in_channels=128, 
-                feat_channels=128,
-                loss_bbox=dict(type='WassersteinLoss', loss_weight=5.0, reduction='sum')),
+        type='YOLOXHead', 
+        num_classes=3, in_channels=128, 
+        feat_channels=128,
+        loss_bbox=dict(type='WassersteinLoss', loss_weight=5.0, reduction='sum')),
     train_cfg=dict(assigner=dict(type='SimOTAAssigner', center_radius=2.5)),
     # In order to align the source code, the threshold of the val phase is
     # 0.01, and the threshold of the test phase is 0.001.
@@ -28,7 +27,7 @@ model = dict(
 # fp16 = dict(loss_scale=512.)
 
 # dataset settings
-data_root = 'data/AI-TOD/'
+data_root = 'data/three_defect_COCO/'
 dataset_type = 'CocoDataset'
 
 train_pipeline = [
@@ -63,8 +62,8 @@ train_dataset = dict(
     type='MultiImageMixDataset',
     dataset=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/aitod_train_v1.json',
-        img_prefix=data_root + 'train/images/',
+        ann_file=data_root + 'annotations/train2017.json',
+        img_prefix=data_root + 'train2017/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', with_bbox=True)
@@ -98,13 +97,13 @@ data = dict(
     train=train_dataset,
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/aitod_val_v1.json',
-        img_prefix=data_root + 'val/images/',
+        ann_file=data_root + 'annotations/val2017.json',
+        img_prefix=data_root + 'val2017/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/aitod_val_v1.json',
-        img_prefix=data_root + 'val/images/',
+        ann_file=data_root + 'annotations/val2017.json',
+        img_prefix=data_root + 'val2017/',
         pipeline=test_pipeline))
 
 # optimizer
@@ -163,7 +162,7 @@ evaluation = dict(
     interval=interval,
     dynamic_intervals=[(max_epochs - num_last_epochs, 1)],
     metric='bbox')
-log_config = dict(interval=50)
+log_config = dict(interval=1)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
