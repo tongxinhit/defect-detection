@@ -22,42 +22,15 @@ from .custom import CustomDataset
 @DATASETS.register_module()
 class CocoDataset(CustomDataset):
 
-    CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
-               'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
-               'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
-               'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe',
-               'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
-               'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat',
-               'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
-               'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl',
-               'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot',
-               'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
-               'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop',
-               'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
-               'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock',
-               'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
+    # CLASSES = ('airplane','bridge','storage-tank','ship','swimming-pool','vehicle',
+    #     'person','wind-mill')
+    CLASSES = ('hole','incision','scorched')
+    # CLASSES = ('Supporting wheel', 'pulley')
 
-    PALETTE = [(220, 20, 60), (119, 11, 32), (0, 0, 142), (0, 0, 230),
-               (106, 0, 228), (0, 60, 100), (0, 80, 100), (0, 0, 70),
-               (0, 0, 192), (250, 170, 30), (100, 170, 30), (220, 220, 0),
-               (175, 116, 175), (250, 0, 30), (165, 42, 42), (255, 77, 255),
-               (0, 226, 252), (182, 182, 255), (0, 82, 0), (120, 166, 157),
-               (110, 76, 0), (174, 57, 255), (199, 100, 0), (72, 0, 118),
-               (255, 179, 240), (0, 125, 92), (209, 0, 151), (188, 208, 182),
-               (0, 220, 176), (255, 99, 164), (92, 0, 73), (133, 129, 255),
-               (78, 180, 255), (0, 228, 0), (174, 255, 243), (45, 89, 255),
-               (134, 134, 103), (145, 148, 174), (255, 208, 186),
-               (197, 226, 255), (171, 134, 1), (109, 63, 54), (207, 138, 255),
-               (151, 0, 95), (9, 80, 61), (84, 105, 51), (74, 65, 105),
-               (166, 196, 102), (208, 195, 210), (255, 109, 65), (0, 143, 149),
-               (179, 0, 194), (209, 99, 106), (5, 121, 0), (227, 255, 205),
-               (147, 186, 208), (153, 69, 1), (3, 95, 161), (163, 255, 0),
-               (119, 0, 170), (0, 182, 199), (0, 165, 120), (183, 130, 88),
-               (95, 32, 0), (130, 114, 135), (110, 129, 133), (166, 74, 118),
-               (219, 142, 185), (79, 210, 114), (178, 90, 62), (65, 70, 15),
-               (127, 167, 115), (59, 105, 106), (142, 108, 45), (196, 172, 0),
-               (95, 54, 80), (128, 76, 255), (201, 57, 1), (246, 0, 122),
-               (191, 162, 208)]
+    # PALETTE = [(220, 20, 60), (119, 11, 32), (20,220,60), (20,20,220),
+    #            (100, 20, 60), (119, 100, 32), (20,220,220), (220,20,220)]
+    # PALETTE = [(220, 20, 60)(119, 11, 32)]
+    PALETTE = [(220, 20, 60),(119, 11, 32), (20,220,220)]
 
     def load_annotations(self, ann_file):
         """Load annotation from COCO style annotation file.
@@ -73,7 +46,6 @@ class CocoDataset(CustomDataset):
         # The order of returned `cat_ids` will not
         # change with the order of the CLASSES
         self.cat_ids = self.coco.get_cat_ids(cat_names=self.CLASSES)
-
         self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
         self.img_ids = self.coco.get_img_ids()
         data_infos = []
@@ -536,11 +508,12 @@ class CocoDataset(CustomDataset):
                 with contextlib.redirect_stdout(redirect_string):
                     cocoEval.summarize()
                 print_log('\n' + redirect_string.getvalue(), logger=logger)
-
+                print("coco", cocoEval.stats)
                 if classwise:  # Compute per-category AP
                     # Compute per-category AP
                     # from https://github.com/facebookresearch/detectron2/
                     precisions = cocoEval.eval['precision']
+
                     # precision: (iou, recall, cls, area range, max dets)
                     assert len(self.cat_ids) == precisions.shape[2]
 
@@ -594,9 +567,9 @@ class CocoDataset(CustomDataset):
                  metric='bbox',
                  logger=None,
                  jsonfile_prefix=None,
-                 classwise=False,
+                 classwise=True,
                  proposal_nums=(100, 300, 1000),
-                 iou_thrs=None,
+                 iou_thrs=[0.5],
                  metric_items=None):
         """Evaluation in COCO protocol.
 

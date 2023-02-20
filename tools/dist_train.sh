@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+export CUDA_VISIBLE_DEVICES=2,3
 CONFIG=$1
 GPUS=$2
 NNODES=${NNODES:-1}
@@ -16,5 +16,6 @@ python -m torch.distributed.launch \
     --master_port=$PORT \
     $(dirname "$0")/train.py \
     $CONFIG \
+    --work-dir work_dir_defects/test\
     --seed 0 \
     --launcher pytorch ${@:3}

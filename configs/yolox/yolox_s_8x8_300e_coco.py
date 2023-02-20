@@ -10,19 +10,21 @@ model = dict(
     random_size_interval=10,
     backbone=dict(type='CSPDarknet', deepen_factor=0.33, widen_factor=0.5),
     neck=dict(
-        type='YOLOXPAFPN',
-        in_channels=[128, 256, 512],
-        out_channels=128,
-        num_csp_blocks=1),
+                type='YOLOXPAFPN',
+                in_channels=[128, 256, 512],
+                out_channels=128,
+                num_csp_blocks=1),
     bbox_head=dict(
-        type='YOLOXHead', num_classes=80, in_channels=128, feat_channels=128),
+        type='YOLOXHead', num_classes=3, in_channels=128, feat_channels=128),
     train_cfg=dict(assigner=dict(type='SimOTAAssigner', center_radius=2.5)),
     # In order to align the source code, the threshold of the val phase is
     # 0.01, and the threshold of the test phase is 0.001.
     test_cfg=dict(score_thr=0.01, nms=dict(type='nms', iou_threshold=0.65)))
 
+# fp16 = dict(loss_scale=512.)
+
 # dataset settings
-data_root = 'data/coco/'
+data_root = 'data/three_defect_COCO/'
 dataset_type = 'CocoDataset'
 
 train_pipeline = [
@@ -57,7 +59,7 @@ train_dataset = dict(
     type='MultiImageMixDataset',
     dataset=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_train2017.json',
+        ann_file=data_root + 'annotations/train2017.json',
         img_prefix=data_root + 'train2017/',
         pipeline=[
             dict(type='LoadImageFromFile'),
@@ -71,7 +73,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=img_scale,
+        img_scale=(800,800),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -92,12 +94,12 @@ data = dict(
     train=train_dataset,
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
+        ann_file=data_root + 'annotations/val2017.json',
         img_prefix=data_root + 'val2017/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
+        ann_file=data_root + 'annotations/val2017.json',
         img_prefix=data_root + 'val2017/',
         pipeline=test_pipeline))
 
@@ -105,14 +107,14 @@ data = dict(
 # default 8 gpu
 optimizer = dict(
     type='SGD',
-    lr=0.01,
+    lr=0.001,
     momentum=0.9,
-    weight_decay=5e-4,
+    weight_decay=5e-3,
     nesterov=True,
     paramwise_cfg=dict(norm_decay_mult=0., bias_decay_mult=0.))
 optimizer_config = dict(grad_clip=None)
 
-max_epochs = 300
+max_epochs = 200
 num_last_epochs = 15
 resume_from = None
 interval = 10
@@ -151,13 +153,13 @@ checkpoint_config = dict(interval=interval)
 evaluation = dict(
     save_best='auto',
     # The evaluation interval is 'interval' when running epoch is
-    # less than ‘max_epochs - num_last_epochs’.
+    # less than 鈥榤ax_epochs - num_last_epochs鈥�.
     # The evaluation interval is 1 when running epoch is greater than
-    # or equal to ‘max_epochs - num_last_epochs’.
+    # or equal to 鈥榤ax_epochs - num_last_epochs鈥�.
     interval=interval,
     dynamic_intervals=[(max_epochs - num_last_epochs, 1)],
     metric='bbox')
-log_config = dict(interval=50)
+log_config = dict(interval=1)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.

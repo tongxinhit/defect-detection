@@ -47,23 +47,24 @@ def plot_curve(log_dicts, args):
             for metric in args.keys:
                 legend.append(f'{json_log}_{metric}')
     assert len(legend) == (len(args.json_logs) * len(args.keys))
-    metrics = args.keys
-
+    metrics = ['loss']
     num_metrics = len(metrics)
     for i, log_dict in enumerate(log_dicts):
         epochs = list(log_dict.keys())
+        print(args.eval_interval)
         for j, metric in enumerate(metrics):
-            print(f'plot curve of {args.json_logs[i]}, metric is {metric}')
-            if metric not in log_dict[epochs[int(args.eval_interval) - 1]]:
-                if 'mAP' in metric:
-                    raise KeyError(
-                        f'{args.json_logs[i]} does not contain metric '
-                        f'{metric}. Please check if "--no-validate" is '
-                        'specified when you trained the model.')
-                raise KeyError(
-                    f'{args.json_logs[i]} does not contain metric {metric}. '
-                    'Please reduce the log interval in the config so that '
-                    'interval is less than iterations of one epoch.')
+            # print(f'plot curve of {args.json_logs[i]}, metric is {metric}')
+            # # print(log_dict[epochs[int(args.eval_interval) - 1]])
+            # if metric not in log_dict[epochs[int(args.eval_interval) - 1]]:
+            #     if 'mAP' in metric:
+            #         raise KeyError(
+            #             f'{args.json_logs[i]} does not contain metric '
+            #             f'{metric}. Please check if "--no-validate" is '
+            #             'specified when you trained the model.')
+            #     raise KeyError(
+            #         f'{args.json_logs[i]} does not contain metric {metric}. '
+            #         'Please reduce the log interval in the config so that '
+            #         'interval is less than iterations of one epoch.')
 
             if 'mAP' in metric:
                 xs = []
@@ -77,9 +78,11 @@ def plot_curve(log_dicts, args):
             else:
                 xs = []
                 ys = []
+                print(log_dict[epochs[0]]['iter'])
                 num_iters_per_epoch = log_dict[epochs[0]]['iter'][-2]
                 for epoch in epochs:
                     iters = log_dict[epoch]['iter']
+                    print(iters)
                     if log_dict[epoch]['mode'][-1] == 'val':
                         iters = iters[:-1]
                     xs.append(

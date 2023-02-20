@@ -43,7 +43,9 @@ class SingleStageDetector(BaseDetector):
         x = self.backbone(img)
         if self.with_neck:
             x = self.neck(x)
+            # neck_out = self.neck(x)  # for visualization
         return x
+        # return neck_out,x   #for visualization
 
     def forward_dummy(self, img):
         """Used for computing network flops.
@@ -51,6 +53,7 @@ class SingleStageDetector(BaseDetector):
         See `mmdetection/tools/analysis_tools/get_flops.py`
         """
         x = self.extract_feat(img)
+        # x,_x = self.extract_feat(img)  #for visualization
         outs = self.bbox_head(x)
         return outs
 
@@ -80,6 +83,7 @@ class SingleStageDetector(BaseDetector):
         """
         super(SingleStageDetector, self).forward_train(img, img_metas)
         x = self.extract_feat(img)
+        # x,_x = self.extract_feat(img)  #for visualization
         losses = self.bbox_head.forward_train(x, img_metas, gt_bboxes,
                                               gt_labels, gt_bboxes_ignore)
         return losses
@@ -99,6 +103,7 @@ class SingleStageDetector(BaseDetector):
                 corresponds to each class.
         """
         feat = self.extract_feat(img)
+        # feat,_x = self.extract_feat(img)  #for visualization?
         results_list = self.bbox_head.simple_test(
             feat, img_metas, rescale=rescale)
         bbox_results = [
@@ -106,6 +111,7 @@ class SingleStageDetector(BaseDetector):
             for det_bboxes, det_labels in results_list
         ]
         return bbox_results
+        # return _x,bbox_results
 
     def aug_test(self, imgs, img_metas, rescale=False):
         """Test function with test time augmentation.
@@ -130,6 +136,7 @@ class SingleStageDetector(BaseDetector):
             ' does not support test-time augmentation'
 
         feats = self.extract_feats(imgs)
+        # feats,_x = self.extract_feats(imgs)  #for visualization?
         results_list = self.bbox_head.aug_test(
             feats, img_metas, rescale=rescale)
         bbox_results = [
@@ -150,6 +157,7 @@ class SingleStageDetector(BaseDetector):
                 and class labels of shape [N, num_det].
         """
         x = self.extract_feat(img)
+        # x,_x = self.extract_feats(img)  #for visualization?
         outs = self.bbox_head(x)
         # get origin input shape to support onnx dynamic shape
 

@@ -169,6 +169,8 @@ class CSPDarknet(BaseModule):
     arch_settings = {
         'P5': [[64, 128, 3, True, False], [128, 256, 9, True, False],
                [256, 512, 9, True, False], [512, 1024, 3, False, True]],
+        # 'P5': [[64, 128, 3, True, False], [128, 256, 9, True, False],
+        #        [256, 512, 9, True, False], [512, 1024, 3, False, True]],
         'P6': [[64, 128, 3, True, False], [128, 256, 9, True, False],
                [256, 512, 9, True, False], [512, 768, 3, True, False],
                [768, 1024, 3, False, True]]
@@ -235,6 +237,14 @@ class CSPDarknet(BaseModule):
                 conv_cfg=conv_cfg,
                 norm_cfg=norm_cfg,
                 act_cfg=act_cfg)
+            # conv_layer = Focus(
+            #     in_channels,
+            #     out_channels,
+            #     kernel_size=3,
+            #     conv_cfg=conv_cfg,
+            #     norm_cfg=norm_cfg,
+            #     act_cfg=act_cfg
+            # )
             stage.append(conv_layer)
             if use_spp:
                 spp = SPPBottleneck(

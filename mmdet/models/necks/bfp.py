@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch.nn.functional as F
 from mmcv.cnn import ConvModule
-from mmcv.cnn.bricks import NonLocal2d
+from mmcv.cnn.bricks import NonLocal2d, ContextBlock
 from mmcv.runner import BaseModule
 
 from ..builder import NECKS
@@ -40,7 +40,7 @@ class BFP(BaseModule):
                  init_cfg=dict(
                      type='Xavier', layer='Conv2d', distribution='uniform')):
         super(BFP, self).__init__(init_cfg)
-        assert refine_type in [None, 'conv', 'non_local']
+        assert refine_type in [None, 'conv', 'non_local', 'gc_block']
 
         self.in_channels = in_channels
         self.num_levels = num_levels
@@ -66,6 +66,13 @@ class BFP(BaseModule):
                 use_scale=False,
                 conv_cfg=self.conv_cfg,
                 norm_cfg=self.norm_cfg)
+        elif self.refine_type == 'gc_block':
+            self.refine = ContextBlock(
+                self.in_channels,
+                ratio = 0.5,
+                pooling_type = 'att',
+                fusion_types = ('channel_add', )
+            )
 
     def forward(self, inputs):
         """Forward function."""
@@ -81,6 +88,8 @@ class BFP(BaseModule):
             else:
                 gathered = F.interpolate(
                     inputs[i], size=gather_size, mode='nearest')
+            # if self.refine_type == 'gc_block':
+            #     gathered = self.refine(gathered)
             feats.append(gathered)
 
         bsf = sum(feats) / len(feats)
@@ -97,6 +106,8 @@ class BFP(BaseModule):
                 residual = F.interpolate(bsf, size=out_size, mode='nearest')
             else:
                 residual = F.adaptive_max_pool2d(bsf, output_size=out_size)
+            if self.refine_type == 'gc_block':
+                residual = self.refine(residual)
             outs.append(residual + inputs[i])
 
         return tuple(outs)

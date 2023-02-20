@@ -149,11 +149,15 @@ def inference_detector(model, imgs):
     # forward the model
     with torch.no_grad():
         results = model(return_loss=False, rescale=True, **data)
+        # _ = model(return_loss=False, rescale=True, **data)[0]           # for visualization
+        # results = model(return_loss=False, rescale=True, **data)[1][0]   # for visualization
 
     if not is_batch:
+        # return _,results
         return results[0]
     else:
         return results
+        # return _,results
 
 
 async def async_inference_detector(model, imgs):

@@ -246,6 +246,7 @@ def main():
         outputs = multi_gpu_test(
             model, data_loader, args.tmpdir, args.gpu_collect
             or cfg.evaluation.get('gpu_collect', False))
+    # print(outputs)
 
     rank, _ = get_dist_info()
     if rank == 0:

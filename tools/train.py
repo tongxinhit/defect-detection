@@ -13,6 +13,8 @@ from mmcv import Config, DictAction
 from mmcv.runner import get_dist_info, init_dist
 from mmcv.utils import get_git_hash
 
+from mmdet.distillation import build_distiller
+
 from mmdet import __version__
 from mmdet.apis import init_random_seed, set_random_seed, train_detector
 from mmdet.datasets import build_dataset
@@ -209,12 +211,19 @@ def main():
     meta['seed'] = seed
     meta['exp_name'] = osp.basename(args.config)
 
-    model = build_detector(
-        cfg.model,
-        train_cfg=cfg.get('train_cfg'),
-        test_cfg=cfg.get('test_cfg'))
-    model.init_weights()
 
+    distiller_cfg = cfg.get('distiller',None)
+    if distiller_cfg is None:
+        model = build_detector(
+            cfg.model,
+            train_cfg=cfg.get('train_cfg'),
+            test_cfg=cfg.get('test_cfg'))
+        model.init_weights()
+    else:
+        teacher_cfg = Config.fromfile(cfg.teacher_cfg)
+        student_cfg = Config.fromfile(cfg.student_cfg)
+        model = build_distiller(cfg.distiller,teacher_cfg,student_cfg)
+    print(model)
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:
         val_dataset = copy.deepcopy(cfg.data.val)

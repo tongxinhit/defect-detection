@@ -4,7 +4,7 @@ from .assigners import (AssignResult, BaseAssigner, CenterRegionAssigner,
 from .builder import build_assigner, build_bbox_coder, build_sampler
 from .coder import (BaseBBoxCoder, DeltaXYWHBBoxCoder, DistancePointBBoxCoder,
                     PseudoBBoxCoder, TBLRBBoxCoder)
-from .iou_calculators import BboxOverlaps2D, bbox_overlaps
+from .iou_calculators import BboxOverlaps2D, bbox_overlaps, wasserstein_dist
 from .samplers import (BaseSampler, CombinedSampler,
                        InstanceBalancedPosSampler, IoUBalancedNegSampler,
                        OHEMSampler, PseudoSampler, RandomSampler,
@@ -24,5 +24,6 @@ __all__ = [
     'build_bbox_coder', 'BaseBBoxCoder', 'PseudoBBoxCoder',
     'DeltaXYWHBBoxCoder', 'TBLRBBoxCoder', 'DistancePointBBoxCoder',
     'CenterRegionAssigner', 'bbox_rescale', 'bbox_cxcywh_to_xyxy',
-    'bbox_xyxy_to_cxcywh', 'RegionAssigner', 'find_inside_bboxes'
+    'bbox_xyxy_to_cxcywh', 'RegionAssigner', 'find_inside_bboxes',
+    'wasserstein_dist'
 ]

@@ -127,7 +127,6 @@ def train_detector(model,
 
     # prepare data loaders
     dataset = dataset if isinstance(dataset, (list, tuple)) else [dataset]
-
     runner_type = 'EpochBasedRunner' if 'runner' not in cfg else cfg.runner[
         'type']
 
@@ -164,7 +163,13 @@ def train_detector(model,
 
     # build optimizer
     auto_scale_lr(cfg, distributed, logger)
-    optimizer = build_optimizer(model, cfg.optimizer)
+    # build runner
+    distiller_cfg = cfg.get('distiller',None)
+    if distiller_cfg is None:
+        optimizer = build_optimizer(model, cfg.optimizer)
+    else:
+        optimizer = build_optimizer(model.module.base_parameters(), cfg.optimizer)
+
 
     runner = build_runner(
         cfg.runner,

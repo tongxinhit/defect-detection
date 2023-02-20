@@ -11,7 +11,8 @@ custom_hooks = [dict(type='NumClassCheckHook')]
 
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = None
+# load_from = '/home/tongxin/mmdetection/checkpoint_file/yolox_s_8x8_300e_coco_20211121_095711-4592a793.pth'
+load_from = '/home/tongxin/mmdetection/checkpoint_file/yolox_s_8x8_300e_coco_20211121_095711-4592a793.pth'
 resume_from = None
 workflow = [('train', 1)]
 
