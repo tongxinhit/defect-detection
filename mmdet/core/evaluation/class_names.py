@@ -68,7 +68,8 @@ def imagenet_vid_classes():
 def coco_classes():
     return [
         # 'Supporting wheel', 'pulley'
-        'hole','incision','scorched'    
+        # 'hole','incision','scorched'
+        'hole','incision','scorched','crevasse','fracture'
         # 'airplane','bridge','storage-tank','ship','swimming-pool','vehicle',
         # 'person','wind-mill'
     ]

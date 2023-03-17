@@ -24,13 +24,13 @@ class CocoDataset(CustomDataset):
 
     # CLASSES = ('airplane','bridge','storage-tank','ship','swimming-pool','vehicle',
     #     'person','wind-mill')
-    CLASSES = ('hole','incision','scorched')
+    CLASSES = ('hole','incision','scorched','crevasse','fracture')
     # CLASSES = ('Supporting wheel', 'pulley')
 
     # PALETTE = [(220, 20, 60), (119, 11, 32), (20,220,60), (20,20,220),
     #            (100, 20, 60), (119, 100, 32), (20,220,220), (220,20,220)]
     # PALETTE = [(220, 20, 60)(119, 11, 32)]
-    PALETTE = [(220, 20, 60),(119, 11, 32), (20,220,220)]
+    PALETTE = [(220, 20, 60),(119, 11, 32), (20,220,220), (100,100,100),(60,60,60)]
 
     def load_annotations(self, ann_file):
         """Load annotation from COCO style annotation file.
